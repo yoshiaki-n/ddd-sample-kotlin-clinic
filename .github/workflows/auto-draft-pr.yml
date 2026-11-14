@@ -1,0 +1,55 @@
+name: Auto Create Draft PR
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+      - 'fix/*'
+      - 'bugfix/*'
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-draft-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Draft PR if not exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          # 1. 既にこのブランチのPRが存在するかチェックする
+          PR_COUNT=$(gh pr list --head "$BRANCH_NAME" --state all --json number -q 'length')
+
+          if [ "$PR_COUNT" -gt 0 ]; then
+            echo "既にPRが存在するため、作成をスキップします。"
+            exit 0
+          fi
+
+          # 2. mainとの差分コミット数をチェック
+          git fetch origin main
+          COMMIT_COUNT=$(git rev-list --count origin/main..HEAD)
+
+          # 3. 差分がない場合は空コミットを作成してプッシュする
+          if [ "$COMMIT_COUNT" -eq 0 ]; then
+            echo "差分コミットがないため、Draft PR用の初期コミットを作成します..."
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "chore: initial empty commit for draft PR"
+            git push origin "$BRANCH_NAME"
+          fi
+
+          # 4. Draft PRを自動作成する
+          echo "Draft PRを自動作成します..."
+          gh pr create \
+            --draft \
+            --base main \
+            --head "$BRANCH_NAME" \
+            --title "WIP: $BRANCH_NAME" \
+            --body "自動作成されたDraft PRです。実装が完了したら「Ready for review」に変更してレビューを依頼してください。"
