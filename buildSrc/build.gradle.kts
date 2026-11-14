@@ -10,6 +10,10 @@ kotlin {
 }
 
 dependencies {
-    // Add a dependency on the Kotlin Gradle plugin, so that convention plugins can apply it.
+    // Add dependencies on Gradle plugins, so that convention plugins can apply them.
     implementation(libs.kotlinGradlePlugin)
+    implementation(libs.kotlinAllopen)
+    implementation(libs.kotlinNoarg)
+    implementation(libs.springBootGradlePlugin)
+    implementation(libs.springDependencyManagementPlugin)
 }
