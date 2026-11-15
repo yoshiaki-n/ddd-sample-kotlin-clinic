@@ -71,6 +71,7 @@ dependencies {
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.assertj:assertj-core")
     testImplementation("com.h2database:h2")
     testImplementation("io.mockk:mockk:1.13.16")
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
