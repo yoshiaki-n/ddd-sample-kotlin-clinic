@@ -23,3 +23,6 @@ include(":app")
 include(":utils")
 
 rootProject.name = "ddd-sample-kotlin-clinic"
+include("billing")
+include("scheduling")
+include("shared-kernel")
